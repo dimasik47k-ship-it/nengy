@@ -12,7 +12,7 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  const path = event.path.replace('/.netlify/functions/api-blobs', '').replace('/.netlify/functions/api', '');
+  const path = event.path.replace('/.netlify/functions/api', '');
   const method = event.httpMethod;
 
   try {
