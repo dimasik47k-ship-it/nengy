@@ -1,0 +1,517 @@
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>shorto. — Сокращатель ссылок</title>
+    <meta name="description" content="shorto. — быстрый и удобный сокращатель ссылок с аналитикой кликов, дашбордом и API. Создавайте короткие ссылки за секунды.">
+    <meta name="keywords" content="сокращатель ссылок, короткие ссылки, URL shortener, аналитика кликов, shorto">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://shorto.ru/">
+    <meta property="og:url" content="https://shorto.ru/">
+    <meta name="theme-color" content="#08090d">
+    <meta name="color-scheme" content="dark">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="shorto. — Сокращатель ссылок">
+    <meta property="og:description" content="Короткие ссылки, точная аналитика. Создавайте, отслеживайте и управляйте ссылками через удобный интерфейс или API.">
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta property="og:site_name" content="shorto.">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:title" content="shorto. — Сокращатель ссылок">
+    <meta name="twitter:description" content="Короткие ссылки, точная аналитика. Создавайте, отслеживайте и управляйте ссылками.">
+
+    <!-- Favicon -->
+    <link rel="icon" href="images/favicon.ico" sizes="48x48">
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    <link rel="manifest" href="/static/manifest.json">
+
+    <!-- OG Image -->
+    <meta property="og:image" content="images/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:image" content="https://shorto.ru/static/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "shorto.",
+        "description": "Быстрый сокращатель ссылок с аналитикой кликов и API",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Web",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+</head>
+<body>
+    <!-- NAV -->
+    <nav class="nav">
+        <a href="#" class="nav__logo" onclick="router.go('home')">
+            <span class="nav__logo-mark">�</span> shorto.
+        </a>
+        <div class="nav__right" id="nav-right"></div>
+    </nav>
+
+    <!-- VIEWS -->
+    <main id="app"></main>
+
+    <!-- TEMPLATES -->
+
+    <!-- HOME (public, no auth required) -->
+    <template id="tpl-home">
+        <div class="home">
+            <div class="home__hero">
+                <h1 class="home__title"><span class="home__diamond">�</span> shorto.</h1>
+                <p class="home__tagline">Short links, sharp insights</p>
+                <form class="shorten shorten--hero" id="shorten-form">
+                    <div class="shorten__form">
+                        <div class="shorten__input-wrap">
+                            <span class="shorten__icon">�</span>
+                            <input type="url" id="shorten-input" class="shorten__input" placeholder="Paste a long URL here..." required="">
+                        </div>
+                        <button type="submit" class="btn btn--primary btn--lg">Shorten</button>
+                    </div>
+                    <div class="shorten__result hidden" id="shorten-result">
+                        <code id="shorten-url"></code>
+                        <button type="button" class="btn btn--ghost" id="copy-btn">Copy</button>
+                    </div>
+                </form>
+                <p class="home__cta">
+                    <a href="#" onclick="router.go('auth')">Sign in</a> to track clicks and manage your links
+                </p>
+            </div>
+            <div class="home__bg">
+                <!-- Shorten demo (right, upper) -->
+                <div class="home__demo home__demo--shorten">
+                    <div class="home__demo-window">
+                        <div class="home__demo-bar">
+                            <span class="home__demo-dot"></span>
+                            <span class="home__demo-dot"></span>
+                            <span class="home__demo-dot"></span>
+                            <span class="home__demo-bar-title">Shorten</span>
+                        </div>
+                        <div class="home__demo-body">
+                            <div class="home__demo-input-row">
+                                <div class="home__demo-input">
+                                    <span class="home__demo-url-text">https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms/edit?gid=0</span>
+                                </div>
+                                <div class="home__demo-btn">Shorten</div>
+                            </div>
+                            <div class="home__demo-result">
+                                <span class="home__demo-check"></span>
+                                <span class="home__demo-result-url">shorto.ru/gDoc5k</span>
+                                <span class="home__demo-copied">Copied!</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard preview (left) -->
+                <div class="home__demo home__demo--dash">
+                    <div class="home__demo-window">
+                        <div class="home__demo-bar">
+                            <span class="home__demo-dot"></span>
+                            <span class="home__demo-dot"></span>
+                            <span class="home__demo-dot"></span>
+                            <span class="home__demo-bar-title">Dashboard</span>
+                        </div>
+                        <div class="home__demo-body">
+                            <div class="home__mock-stats">
+                                <div class="home__mock-stat">
+                                    <span class="home__mock-stat-val">24</span>
+                                    <span class="home__mock-stat-lbl">Links</span>
+                                </div>
+                                <div class="home__mock-stat">
+                                    <span class="home__mock-stat-val">1.8k</span>
+                                    <span class="home__mock-stat-lbl">Clicks</span>
+                                </div>
+                                <div class="home__mock-stat">
+                                    <span class="home__mock-stat-val">75</span>
+                                    <span class="home__mock-stat-lbl">Avg</span>
+                                </div>
+                            </div>
+                            <div class="home__mock-links">
+                                <div class="home__mock-link">
+                                    <span class="home__mock-link-code">shorto/gDoc5</span>
+                                    <div class="home__mock-link-bar" style="--w:100%"></div>
+                                    <span class="home__mock-link-clicks">450</span>
+                                </div>
+                                <div class="home__mock-link">
+                                    <span class="home__mock-link-code">shorto/react</span>
+                                    <div class="home__mock-link-bar" style="--w:69%"></div>
+                                    <span class="home__mock-link-clicks">312</span>
+                                </div>
+                                <div class="home__mock-link">
+                                    <span class="home__mock-link-code">shorto/k8s01</span>
+                                    <div class="home__mock-link-bar" style="--w:44%"></div>
+                                    <span class="home__mock-link-clicks">198</span>
+                                </div>
+                            </div>
+                            <div class="home__mock-chart">
+                                <div class="home__mock-chart-bar" style="--h:40%"></div>
+                                <div class="home__mock-chart-bar" style="--h:65%"></div>
+                                <div class="home__mock-chart-bar" style="--h:30%"></div>
+                                <div class="home__mock-chart-bar" style="--h:90%"></div>
+                                <div class="home__mock-chart-bar" style="--h:55%"></div>
+                                <div class="home__mock-chart-bar" style="--h:80%"></div>
+                                <div class="home__mock-chart-bar" style="--h:45%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API preview (bottom right) -->
+                <div class="home__demo home__demo--api">
+                    <div class="home__demo-window">
+                        <div class="home__demo-bar">
+                            <span class="home__demo-dot"></span>
+                            <span class="home__demo-dot"></span>
+                            <span class="home__demo-dot"></span>
+                            <span class="home__demo-bar-title">API</span>
+                        </div>
+                        <div class="home__demo-body">
+                            <div class="home__mock-endpoint">
+                                <span class="home__mock-method home__mock-method--post">POST</span>
+                                <code class="home__mock-path">/api/shorten</code>
+                            </div>
+                            <pre class="home__mock-code">curl -X POST /api/shorten \
+  -H "Authorization: Bearer ey..." \
+  -d '{"url": "https://example.com"}'</pre>
+                            <div class="home__mock-resp">
+                                <span class="home__mock-resp-lbl">Response</span>
+                                <pre class="home__mock-code home__mock-code--resp">{"short_url": "shorto.ru/Xk9mQ2",
+ "code": "Xk9mQ2"}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- AUTH -->
+    <template id="tpl-auth">
+        <div class="auth">
+            <div class="auth__card">
+                <div class="auth__header">
+                    <h1 class="auth__brand"><span class="auth__diamond">�</span> shorto.</h1>
+                    <p class="auth__tagline">Sign in to manage your links</p>
+                </div>
+                <div class="auth__tabs">
+                    <button class="auth__tab auth__tab--active" data-tab="login">Sign in</button>
+                    <button class="auth__tab" data-tab="register">Create account</button>
+                </div>
+                <form class="auth__form" id="auth-form">
+                    <div class="auth__fields" id="auth-fields"></div>
+                    <div class="auth__error hidden" id="auth-error"></div>
+                    <button type="submit" class="btn btn--primary btn--full" id="auth-submit">Sign in</button>
+                </form>
+                <p class="auth__footer"><a href="#" onclick="router.go('home')">� Back to shortener</a></p>
+            </div>
+            <div class="auth__decoration">
+                <div class="auth__grid">
+                    <div class="auth__grid-item" style="--delay:0"></div>
+                    <div class="auth__grid-item" style="--delay:1"></div>
+                    <div class="auth__grid-item" style="--delay:2"></div>
+                    <div class="auth__grid-item" style="--delay:3"></div>
+                    <div class="auth__grid-item" style="--delay:4"></div>
+                    <div class="auth__grid-item" style="--delay:5"></div>
+                    <div class="auth__grid-item" style="--delay:6"></div>
+                    <div class="auth__grid-item" style="--delay:7"></div>
+                    <div class="auth__grid-item" style="--delay:8"></div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- DASHBOARD -->
+    <template id="tpl-dashboard">
+        <div class="dash">
+            <header class="dash__header">
+                <div>
+                    <h1 class="dash__title">Dashboard</h1>
+                    <p class="dash__subtitle" id="dash-greeting"></p>
+                </div>
+            </header>
+
+            <section class="shorten">
+                <form class="shorten__form" id="shorten-form">
+                    <div class="shorten__input-wrap">
+                        <span class="shorten__icon">�</span>
+                        <input type="url" id="shorten-input" class="shorten__input" placeholder="Paste a long URL here..." required="">
+                    </div>
+                    <button type="submit" class="btn btn--primary">Shorten</button>
+                    <button type="button" class="btn btn--ghost" id="bulk-btn">Bulk</button>
+                </form>
+                <div class="shorten__result hidden" id="dash-shorten-result">
+                    <code id="dash-shorten-url"></code>
+                    <button type="button" class="btn btn--ghost" id="dash-copy-btn">Copy</button>
+                </div>
+            </section>
+
+            <!-- Bulk modal -->
+            <div class="bulk-modal hidden" id="bulk-modal">
+                <div class="bulk-modal__card">
+                    <div class="bulk-modal__header">
+                        <h2 class="bulk-modal__title" id="bulk-title">Bulk create</h2>
+                        <button class="bulk-modal__close" id="bulk-close-x">�</button>
+                    </div>
+                    <textarea class="bulk-modal__textarea" id="bulk-textarea" rows="8" placeholder="One URL per line..."></textarea>
+                    <div class="bulk-modal__actions">
+                        <button class="btn btn--primary" id="bulk-submit">Shorten all</button>
+                        <button class="btn btn--ghost" id="bulk-close">Close</button>
+                    </div>
+                    <div class="bulk-modal__results hidden" id="bulk-results"></div>
+                </div>
+            </div>
+
+            <!-- KPI Bar -->
+            <section class="kpi-bar" id="kpi-row">
+                <div class="kpi-bar__item kpi-bar__item--links">
+                    <div class="kpi-bar__icon">
+                        <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M8.5 11.5a4.5 4.5 0 006.36-6.36l-1.42 1.42a2.5 2.5 0 01-3.54 3.54L8.5 11.5z" fill="currentColor" opacity=".5"></path><path d="M11.5 8.5a4.5 4.5 0 00-6.36 6.36l1.42-1.42a2.5 2.5 0 013.54-3.54L11.5 8.5z" fill="currentColor"></path></svg>
+                    </div>
+                    <span class="kpi-bar__value" id="stat-total">0</span>
+                    <span class="kpi-bar__label">Total links</span>
+                </div>
+                <div class="kpi-bar__divider"></div>
+                <div class="kpi-bar__item kpi-bar__item--clicks">
+                    <div class="kpi-bar__icon">
+                        <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M6.672 1.911a1 1 0 10-1.932.518l.259.966a1 1 0 001.932-.518l-.26-.966zM2.429 4.74a1 1 0 10-.517 1.932l.966.259a1 1 0 00.517-1.932l-.966-.26zM13.325 4.74l.966-.259a1 1 0 00-.518-1.932l-.966.26a1 1 0 00.518 1.932zM10 8a2 2 0 100 4 2 2 0 000-4zm-5 2a5 5 0 1110 0 5 5 0 01-10 0z" fill="currentColor"></path></svg>
+                    </div>
+                    <span class="kpi-bar__value" id="stat-clicks">0</span>
+                    <span class="kpi-bar__label">Total clicks</span>
+                </div>
+                <div class="kpi-bar__divider"></div>
+                <div class="kpi-bar__item kpi-bar__item--avg">
+                    <div class="kpi-bar__icon">
+                        <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M2 11l5 5L18 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg>
+                    </div>
+                    <span class="kpi-bar__value" id="stat-avg">0</span>
+                    <span class="kpi-bar__label">Avg / link</span>
+                </div>
+                <div class="kpi-bar__divider"></div>
+                <div class="kpi-bar__item kpi-bar__item--today">
+                    <div class="kpi-bar__icon">
+                        <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 4a1 1 0 10-2 0v4a1 1 0 00.293.707l2.5 2.5a1 1 0 101.414-1.414L11 9.586V6z" fill="currentColor"></path></svg>
+                    </div>
+                    <span class="kpi-bar__value" id="stat-today">0</span>
+                    <span class="kpi-bar__label">Today</span>
+                </div>
+            </section>
+
+            <!-- Hero: Clicks over time area chart -->
+            <section class="dash__hero-chart" id="section-timeline">
+                <div class="dash__hero-chart-header">
+                    <h2 class="dash__section-title" id="dash-timeline-title">Clicks over time</h2>
+                </div>
+                <div class="dash__area-chart" id="dash-area-chart">
+                    <div class="dash__area-chart-empty" id="dash-chart-empty">
+                        <span>No click data yet</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2-column: Top performing + Devices donut -->
+            <section class="dash__two-col" id="section-top">
+                <div class="dash__panel">
+                    <h2 class="dash__section-title" id="dash-top-title">Top performing</h2>
+                    <div class="dash__top-list" id="top-links"></div>
+                    <div class="dash__top-empty hidden" id="top-empty">
+                        <p>No click data yet</p>
+                    </div>
+                </div>
+                <div class="dash__panel">
+                    <h2 class="dash__section-title" id="dash-devices-title">Devices</h2>
+                    <div class="dash__donut-wrap" id="dash-donut"></div>
+                </div>
+            </section>
+
+            <!-- 2-column: Countries + Browsers -->
+            <section class="dash__two-col" id="section-geo">
+                <div class="dash__panel">
+                    <h2 class="dash__section-title" id="dash-countries-title">Countries</h2>
+                    <div class="analytics__bars" id="dash-countries"></div>
+                </div>
+                <div class="dash__panel">
+                    <h2 class="dash__section-title" id="dash-browsers-title">Browsers</h2>
+                    <div class="analytics__bars" id="dash-browsers"></div>
+                </div>
+            </section>
+
+            <!-- Hourly heatmap -->
+            <section class="dash__panel dash__panel--full" id="section-hourly">
+                <h2 class="dash__section-title" id="dash-hourly-title">Clicks by hour</h2>
+                <div class="dash__heatmap" id="dash-heatmap"></div>
+            </section>
+
+            <!-- Links list -->
+            <section class="links" id="section-links">
+                <div class="links__header">
+                    <h2 class="links__title">Your links</h2>
+                    <span class="links__count" id="links-count"></span>
+                </div>
+                <div class="links__list" id="links-list"></div>
+                <div class="links__empty hidden" id="links-empty">
+                    <span class="links__empty-icon">�</span>
+                    <p>No links yet. Paste a URL above to get started.</p>
+                </div>
+            </section>
+        </div>
+    </template>
+
+    <!-- DETAIL -->
+    <template id="tpl-detail">
+        <div class="detail">
+            <button class="detail__back" id="detail-back">� Back to dashboard</button>
+            <div class="detail__card">
+                <div class="detail__top">
+                    <div>
+                        <h1 class="detail__code" id="detail-code"></h1>
+                        <div class="detail__original-row">
+                            <a class="detail__original" id="detail-original" target="_blank" rel="noopener"></a>
+                            <button class="btn btn--ghost btn--small detail__edit-btn" id="detail-edit"></button>
+                        </div>
+                        <div class="detail__edit-row hidden" id="detail-edit-row">
+                            <input type="url" class="field__input detail__edit-input" id="detail-edit-input" placeholder="https://...">
+                            <button class="btn btn--primary btn--small" id="detail-edit-save">Save</button>
+                            <button class="btn btn--ghost btn--small" id="detail-edit-cancel">Cancel</button>
+                        </div>
+                    </div>
+                    <div class="detail__clicks-big">
+                        <span class="detail__clicks-num" id="detail-clicks">0</span>
+                        <span class="detail__clicks-label">clicks</span>
+                    </div>
+                </div>
+                <div class="detail__meta">
+                    <div class="detail__meta-item">
+                        <span class="detail__meta-label">Short URL</span>
+                        <code class="detail__meta-value" id="detail-short"></code>
+                    </div>
+                    <div class="detail__meta-item">
+                        <span class="detail__meta-label">Created</span>
+                        <span class="detail__meta-value" id="detail-created"></span>
+                    </div>
+                </div>
+
+                <!-- Click activity by day -->
+                <div class="detail__chart-wrap">
+                    <h3 class="detail__chart-title">Click activity</h3>
+                    <div class="detail__chart" id="detail-chart"></div>
+                </div>
+
+                <!-- Analytics dashboards -->
+                <div class="analytics" id="analytics-section">
+                    <div class="analytics__grid">
+                        <!-- By country -->
+                        <div class="analytics__card">
+                            <h3 class="analytics__card-title" id="analytics-country-title">Countries</h3>
+                            <div class="analytics__bars" id="analytics-countries"></div>
+                        </div>
+                        <!-- By device -->
+                        <div class="analytics__card">
+                            <h3 class="analytics__card-title" id="analytics-device-title">Devices</h3>
+                            <div class="analytics__bars" id="analytics-devices"></div>
+                        </div>
+                        <!-- By browser -->
+                        <div class="analytics__card">
+                            <h3 class="analytics__card-title" id="analytics-browser-title">Browsers</h3>
+                            <div class="analytics__bars" id="analytics-browsers"></div>
+                        </div>
+                        <!-- By OS -->
+                        <div class="analytics__card">
+                            <h3 class="analytics__card-title" id="analytics-os-title">Operating systems</h3>
+                            <div class="analytics__bars" id="analytics-os"></div>
+                        </div>
+                    </div>
+
+                    <!-- Hourly distribution -->
+                    <div class="analytics__card analytics__card--wide">
+                        <h3 class="analytics__card-title" id="analytics-hourly-title">Clicks by hour</h3>
+                        <div class="analytics__hour-chart" id="analytics-hours"></div>
+                    </div>
+
+                    <!-- Recent clicks table -->
+                    <div class="analytics__card analytics__card--wide">
+                        <h3 class="analytics__card-title" id="analytics-recent-title">Recent clicks</h3>
+                        <div class="analytics__table-wrap">
+                            <table class="analytics__table" id="analytics-table">
+                                <thead>
+                                    <tr>
+                                        <th>IP</th>
+                                        <th id="th-country">Country</th>
+                                        <th id="th-city">City</th>
+                                        <th id="th-device">Device</th>
+                                        <th id="th-browser">Browser</th>
+                                        <th id="th-time">Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="analytics-tbody"></tbody>
+                            </table>
+                        </div>
+                        <div class="analytics__empty hidden" id="analytics-empty">No click data yet</div>
+                    </div>
+                </div>
+
+                <div class="detail__actions">
+                    <button class="btn btn--ghost" id="detail-copy">Copy short URL</button>
+                    <button class="btn btn--ghost" id="detail-export">Export CSV</button>
+                    <button class="btn btn--danger" id="detail-delete">Delete link</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- API REFERENCE -->
+    <template id="tpl-api">
+        <div class="api-page">
+            <header class="api-page__header">
+                <h1 class="api-page__title">API Reference</h1>
+                <p class="api-page__subtitle">Integrate shorto. into your apps and workflows</p>
+            </header>
+            <div id="api-content"></div>
+        </div>
+    </template>
+
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106741879', 'ym');
+        ym(106741879, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/106741879" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+    <script>
+        // Очистка битых данных
+        try {
+            const user = localStorage.getItem("user");
+            if (user === "undefined" || user === "null") {
+                localStorage.clear();
+            }
+        } catch(e) {}
+    </script>
+    <script src="js/script.js?v=5"></script>
+
+
+</body></html>
