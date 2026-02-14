@@ -1,9 +1,9 @@
-const { getDB, saveDB, parseUserAgent } = require('./db-blobs');
+const { getLinks, parseUserAgent } = require('./db');
 
 exports.handler = async (event) => {
   const code = event.path.split('/').pop();
-  const db = await getDB();
-  const link = db.links[code];
+  const links = await getLinks();
+  const link = await links.findOne({ code });
 
   if (!link) {
     return {
@@ -31,11 +31,13 @@ exports.handler = async (event) => {
     language: event.headers['accept-language']?.split(',')[0] || 'en'
   };
 
-  link.clicks++;
-  link.stats = link.stats || [];
-  link.stats.push(stat);
-  
-  await saveDB(db);
+  await links.updateOne(
+    { code },
+    { 
+      $inc: { clicks: 1 },
+      $push: { stats: stat }
+    }
+  );
 
   return {
     statusCode: 302,

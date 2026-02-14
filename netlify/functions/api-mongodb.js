@@ -1,4 +1,4 @@
-const { getDB, saveDB, generateUniqueCode, parseUserAgent } = require('./db-blobs');
+const { getLinks, getUsers, generateUniqueCode, parseUserAgent } = require('./db');
 
 exports.handler = async (event) => {
   const headers = {
@@ -12,11 +12,12 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  const path = event.path.replace('/.netlify/functions/api-blobs', '').replace('/.netlify/functions/api', '');
+  const path = event.path.replace('/.netlify/functions/api', '');
   const method = event.httpMethod;
 
   try {
-    const db = await getDB();
+    const links = await getLinks();
+    const users = await getUsers();
 
     // POST /shorten
     if (path === '/shorten' && method === 'POST') {
@@ -28,15 +29,15 @@ exports.handler = async (event) => {
       }
       
       const code = await generateUniqueCode();
-      db.links[code] = {
+      await links.insertOne({
+        code,
         url,
         created: new Date().toISOString(),
         clicks: 0,
         stats: []
-      };
-      await saveDB(db);
+      });
       
-      const shortUrl = `${event.headers.origin || event.headers.host || 'https://shorto.netlify.app'}/${code}`;
+      const shortUrl = `${event.headers.origin || 'https://shorto.netlify.app'}/${code}`;
       return { statusCode: 200, headers, body: JSON.stringify({ short_url: shortUrl, code }) };
     }
 
@@ -50,43 +51,45 @@ exports.handler = async (event) => {
         try {
           new URL(url);
           const code = await generateUniqueCode();
-          db.links[code] = {
+          await links.insertOne({
+            code,
             url,
             created: new Date().toISOString(),
             clicks: 0,
             stats: []
-          };
-          const shortUrl = `${event.headers.origin || event.headers.host || 'https://shorto.netlify.app'}/${code}`;
+          });
+          const shortUrl = `${event.headers.origin || 'https://shorto.netlify.app'}/${code}`;
           results.push({ url, short_url: shortUrl, code });
         } catch (e) {
           errors.push({ url, error: 'Invalid URL' });
         }
       }
       
-      await saveDB(db);
       return { statusCode: 200, headers, body: JSON.stringify({ results, errors }) };
     }
 
     // GET /urls
     if (path === '/urls' && method === 'GET') {
-      const links = Object.entries(db.links).map(([code, data]) => ({
-        code,
-        short_url: `${event.headers.origin || event.headers.host || 'https://shorto.netlify.app'}/${code}`,
-        original_url: data.url,
-        clicks: data.clicks,
-        created_at: data.created
+      const allLinks = await links.find({}).toArray();
+      const urlsList = allLinks.map(link => ({
+        code: link.code,
+        short_url: `${event.headers.origin || 'https://shorto.netlify.app'}/${link.code}`,
+        original_url: link.url,
+        clicks: link.clicks,
+        created_at: link.created
       }));
-      return { statusCode: 200, headers, body: JSON.stringify({ urls: links }) };
+      return { statusCode: 200, headers, body: JSON.stringify({ urls: urlsList }) };
     }
 
     // GET /analytics
     if (path === '/analytics' && method === 'GET') {
-      const totalLinks = Object.keys(db.links).length;
-      const totalClicks = Object.values(db.links).reduce((sum, link) => sum + link.clicks, 0);
+      const allLinks = await links.find({}).toArray();
+      const totalLinks = allLinks.length;
+      const totalClicks = allLinks.reduce((sum, link) => sum + link.clicks, 0);
       
       const devices = {}, browsers = {}, os = {}, byDay = {}, byHour = Array(24).fill(0), countries = {};
       
-      Object.values(db.links).forEach(link => {
+      allLinks.forEach(link => {
         (link.stats || []).forEach(stat => {
           const device = stat.device || 'Unknown';
           const browser = stat.browser || 'Unknown';
@@ -128,8 +131,10 @@ exports.handler = async (event) => {
 
     // GET /geo
     if (path === '/geo' && method === 'GET') {
+      const allLinks = await links.find({}).toArray();
       const countries = {}, cities = {};
-      Object.values(db.links).forEach(link => {
+      
+      allLinks.forEach(link => {
         (link.stats || []).forEach(stat => {
           const country = stat.country || 'Unknown';
           const city = stat.city || 'Unknown';
@@ -158,8 +163,7 @@ exports.handler = async (event) => {
         created: new Date().toISOString()
       };
       
-      db.users[userId] = user;
-      await saveDB(db);
+      await users.insertOne(user);
       
       return { statusCode: 200, headers, body: JSON.stringify({ success: true, token: 'token-' + userId, user }) };
     }
@@ -184,11 +188,15 @@ exports.handler = async (event) => {
     const statsMatch = path.match(/^\/stats\/([^/]+)$/);
     if (statsMatch && method === 'GET') {
       const code = statsMatch[1];
-      const link = db.links[code];
+      const link = await links.findOne({ code });
       if (!link) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) };
       
       return { statusCode: 200, headers, body: JSON.stringify({
-        code, url: link.url, clicks: link.clicks, created: link.created, stats: link.stats || []
+        code: link.code,
+        url: link.url,
+        clicks: link.clicks,
+        created: link.created,
+        stats: link.stats || []
       })};
     }
 
@@ -196,7 +204,7 @@ exports.handler = async (event) => {
     const clicksMatch = path.match(/^\/clicks\/([^/]+)$/);
     if (clicksMatch && method === 'GET') {
       const code = clicksMatch[1];
-      const link = db.links[code];
+      const link = await links.findOne({ code });
       if (!link) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) };
       
       const byDay = {}, byHour = Array(24).fill(0), devices = {}, browsers = {}, os = {}, countries = {};
@@ -228,8 +236,12 @@ exports.handler = async (event) => {
       const countriesArray = Object.entries(countries).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
       
       return { statusCode: 200, headers, body: JSON.stringify({
-        by_day: byDayArray, by_hour: byHour, by_device: devicesArray,
-        by_browser: browsersArray, by_os: osArray, by_country: countriesArray,
+        by_day: byDayArray,
+        by_hour: byHour,
+        by_device: devicesArray,
+        by_browser: browsersArray,
+        by_os: osArray,
+        by_country: countriesArray,
         recent_clicks: (link.stats || []).slice(-50).reverse()
       })};
     }
@@ -239,10 +251,12 @@ exports.handler = async (event) => {
     if (updateMatch && method === 'PUT') {
       const code = updateMatch[1];
       const { url } = JSON.parse(event.body);
-      if (!db.links[code]) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) };
       
-      db.links[code].url = url;
-      await saveDB(db);
+      const result = await links.updateOne({ code }, { $set: { url } });
+      if (result.matchedCount === 0) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) };
+      }
+      
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     }
 
@@ -250,10 +264,12 @@ exports.handler = async (event) => {
     const deleteMatch = path.match(/^\/delete\/([^/]+)$/);
     if (deleteMatch && method === 'DELETE') {
       const code = deleteMatch[1];
-      if (!db.links[code]) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) };
       
-      delete db.links[code];
-      await saveDB(db);
+      const result = await links.deleteOne({ code });
+      if (result.deletedCount === 0) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) };
+      }
+      
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     }
 
