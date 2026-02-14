@@ -1,37 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-
-const DB_FILE = path.join(__dirname, '../../database.json');
-
-function loadDB() {
-  try {
-    if (fs.existsSync(DB_FILE)) {
-      return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-    }
-  } catch (e) {}
-  return { links: {}, users: {} };
-}
-
-function saveDB(db) {
-  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
-}
-
-function parseUserAgent(ua) {
-  const browser = ua.match(/(Chrome|Firefox|Safari|Edge|Opera|OPR)\/[\d.]+/)?.[1] || 'Unknown';
-  const os = ua.includes('Windows') ? 'Windows' : 
-             ua.includes('Mac') ? 'macOS' : 
-             ua.includes('Linux') ? 'Linux' : 
-             ua.includes('Android') ? 'Android' : 
-             ua.includes('iOS') ? 'iOS' : 'Unknown';
-  const device = ua.includes('Mobile') || ua.includes('Android') ? 'Mobile' : 
-                 ua.includes('Tablet') || ua.includes('iPad') ? 'Tablet' : 'Desktop';
-  return { browser, os, device };
-}
+const { getLinks, parseUserAgent } = require('./db');
 
 exports.handler = async (event) => {
   const code = event.path.split('/').pop();
-  const db = loadDB();
-  const link = db.links[code];
+  const links = await getLinks();
+  const link = await links.findOne({ code });
 
   if (!link) {
     return {
@@ -59,10 +31,13 @@ exports.handler = async (event) => {
     language: event.headers['accept-language']?.split(',')[0] || 'en'
   };
 
-  link.clicks++;
-  link.stats = link.stats || [];
-  link.stats.push(stat);
-  saveDB(db);
+  await links.updateOne(
+    { code },
+    { 
+      $inc: { clicks: 1 },
+      $push: { stats: stat }
+    }
+  );
 
   return {
     statusCode: 302,
