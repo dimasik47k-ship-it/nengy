@@ -1,7 +1,16 @@
 const { getDB, saveDB, parseUserAgent } = require('./db-simple');
 
 exports.handler = async (event) => {
-  const code = event.path.split('/').pop();
+  // Получаем код из пути
+  let code = event.path.split('/').filter(Boolean).pop();
+  
+  // Если код это 'redirect', значит путь был /:code и код в следующем сегменте
+  if (code === 'redirect' || code === '.netlify' || code === 'functions') {
+    // Пробуем получить из rawUrl
+    const urlParts = (event.rawUrl || event.path).split('/').filter(Boolean);
+    code = urlParts[urlParts.length - 1];
+  }
+  
   const db = await getDB();
   const link = db.links[code];
 

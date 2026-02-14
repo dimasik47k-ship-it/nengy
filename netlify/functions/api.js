@@ -12,7 +12,24 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  const path = event.path.replace('/.netlify/functions/api', '');
+  // Получаем путь из rawUrl или path
+  let path = event.path;
+  
+  // Убираем префикс функции если есть
+  if (path.startsWith('/.netlify/functions/api')) {
+    path = path.replace('/.netlify/functions/api', '');
+  }
+  
+  // Если путь начинается с /api, убираем это
+  if (path.startsWith('/api')) {
+    path = path.replace('/api', '');
+  }
+  
+  // Если путь пустой, ставим /
+  if (!path || path === '') {
+    path = '/';
+  }
+  
   const method = event.httpMethod;
 
   try {
