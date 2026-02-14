@@ -1,4 +1,4 @@
-const { getDB, saveDB, parseUserAgent } = require('./db-blobs');
+const { getDB, saveDB, parseUserAgent } = require('./db-simple');
 
 exports.handler = async (event) => {
   const code = event.path.split('/').pop();

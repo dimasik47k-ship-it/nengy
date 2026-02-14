@@ -1,4 +1,4 @@
-const { getDB, saveDB, generateUniqueCode, parseUserAgent } = require('./db-blobs');
+const { getDB, saveDB, generateUniqueCode, parseUserAgent } = require('./db-simple');
 
 exports.handler = async (event) => {
   const headers = {
