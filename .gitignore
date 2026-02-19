@@ -1,6 +1,12 @@
-node_modules/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+*.db
 .env
-.env.local
-database.json
-.netlify/
-*.log
+.DS_Store

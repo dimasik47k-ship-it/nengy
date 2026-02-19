@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⧉ NΞN HUB — Главный Roblox-портал</title>
+    
+    <!-- ИКОНКА САЙТА (Favicon) -->
+    <!-- Закиньте файл favicon.png или favicon.ico в корень папки -->
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+
+        :root {
+            --bg-main: #0a0b10;
+            --bg-surface: #12141d;
+            --bg-surface-light: #1a1d27;
+            --accent: #00AEEF;
+            --accent-glow: rgba(0, 174, 239, 0.4);
+            --text-main: #ffffff;
+            --text-muted: #8b949e;
+            --border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 40%),
+                        radial-gradient(circle at 100% 100%, var(--accent-glow) 0%, transparent 40%);
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        ::selection {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* Утилиты */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        .section {
+            padding: 120px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent);
+            margin-bottom: 24px;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .title {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 48px;
+        }
+
+        .text-accent {
+            color: var(--accent);
+        }
+
+        /* Кнопки */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--accent);
+            color: #fff;
+            padding: 18px 36px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .btn:hover {
+            background: transparent;
+            border-color: var(--accent);
+            box-shadow: 0 0 40px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* НАВИГАЦИЯ (Логотип) */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 0;
+            z-index: 100;
+            background: rgba(10, 11, 16, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: opacity 0.3s ease;
+        }
+
+        .logo-link:hover {
+            opacity: 0.8;
+        }
+
+        .logo-img {
+            height: 40px; /* Высота логотипа, ширина подстроится автоматически */
+            width: auto;
+            display: block;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .nav-btn {
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            border: 1px solid var(--accent);
+            background: transparent;
+            color: var(--text-main);
+            border-radius: 4px;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-top: 100px; /* Отступ под Navbar */
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+            margin-top: 64px;
+            border-top: 1px solid var(--border);
+            padding-top: 32px;
+        }
+
+        .stat-item span {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .stat-item p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Грид контента (Модули) */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: 40px 32px;
+            border-radius: 8px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover {
+            background: var(--bg-surface-light);
+            transform: translateY(-5px);
+            border-color: rgba(0, 174, 239, 0.2);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 24px;
+            color: var(--accent);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* 100+ Info Section (Массив данных) */
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+        }
+
+        @media (max-width: 900px) {
+            .data-grid { grid-template-columns: 1fr; }
+            .hero-stats { flex-wrap: wrap; gap: 24px; }
+            .logo-text { display: none; } /* Скрываем текст лого на мобильных, оставляем только картинку */
+        }
+
+        .data-list {
+            list-style: none;
+        }
+
+        .data-list li {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            color: var(--text-muted);
+        }
+
+        .data-list li svg {
+            width: 20px;
+            height: 20px;
+            color: var(--accent);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .data-list li strong {
+            color: var(--text-main);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Banner */
+        .cta-banner {
+            background: linear-gradient(135deg, var(--bg-surface) 0%, #05141e 100%);
+            border: 1px solid var(--accent);
+            padding: 80px 40px;
+            text-align: center;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0, 174, 239, 0.1);
+        }
+
+        .cta-banner h2 {
+            font-size: 3rem;
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ С ЛОГОТИПОМ -->
+    <nav class="navbar">
+        <div class="container navbar-container">
+            <a href="#" class="logo-link">
+                <!-- Закиньте файл logo.png или logo.svg в корень папки. Если файла пока нет, иконка будет пустой, но текст останется -->
+                <img src="logo.png" alt="NEN HUB Logo" class="logo-img" onerror="this.style.display='none'">
+                <span class="logo-text">⧉ NΞN</span>
+            </a>
+            
+            <a href="https://t.me/your_channel_link" class="nav-btn" target="_blank">Telegram</a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="section hero">
+        <div class="container">
+            <span class="label">Официальный Telegram Хаб</span>
+            <h1 class="title">Синдикат<br><span class="text-accent">Roblox</span> Разработки</h1>
+            <p class="subtitle">Ультимативная база знаний 2026 года. Скриптинг в Roblox Studio, инсайдерские новости платформы, техническая поддержка, конкурсы и комьюнити.</p>
+            
+            <a href="https://t.me/your_channel_link" class="btn" target="_blank">
+                <svg viewBox="0 0 24 24"><path d="M21.93 3.14L2.06 10.82c-1.33.51-1.32 1.28-.24 1.61l5.12 1.6 11.88-7.5c.56-.34 1.07-.16.66.21l-9.61 8.68-.35 5.3c.51 0 .73-.24 1.02-.52l2.45-2.38 5.1 3.77c.94.52 1.61.25 1.84-.85l3.33-15.68c.32-1.28-.48-1.87-1.33-1.52z"/></svg>
+                Подписаться на канал
+            </a>
+
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span>100+</span>
+                    <p>Уникальных гайдов</p>
+                </div>
+                <div class="stat-item">
+                    <span>24/7</span>
+                    <p>Новостной поток</p>
+                </div>
+                <div class="stat-item">
+                    <span>∞</span>
+                    <p>Ресурсов для Studio</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CORE FEATURES -->
+    <section class="section">
+        <div class="container">
+            <span class="label">Архитектура контента</span>
+            <h2 class="title" style="font-size: 3rem; margin-bottom: 64px;">Всё, что нужно<br>в одном месте</h2>
+
+            <div class="features-grid">
+                <!-- Студия -->
+                <div class="feature-card">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    <h3>Roblox Studio</h3>
+                    <p>От установки программы до написания сложных ServerScripts на Luau. Архитектура игр, UI/UX, оптимизация и работа с DataStore.</p>
+                </div>
+                
+                <!-- Новости -->
+                <div class="feature-card">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                    <h3>Инсайды и Новости</h3>
+                    <p>Сливы обновлений, новые API платформы, изменения в алгоритмах поиска игр и тренды, которые взорвут платформу завтра.</p>
+                </div>
+
+                <!-- Поддержка -->
+                <div class="feature-card">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <h3>Поддержка</h3>
+                    <p>Не работает скрипт? Баг в студии? Наше комьюнити и администрация помогут разобрать код и найти решение проблемы.</p>
+                </div>
+
+                <!-- Мемы и Фан -->
+                <div class="feature-card">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <h3>Мемы & Комьюнити</h3>
+                    <p>Локальный юмор разработчиков, боли от багов Roblox, обсуждения трендовых плейсов и просто отдых в кругу единомышленников.</p>
+                </div>
+
+                <!-- Конкурсы -->
+                <div class="feature-card">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+                    <h3>Раздачи и Ивенты</h3>
+                    <p>Регулярные розыгрыши Robux, лимитированных UGC-вещей, а также Game Jam соревнования с денежным фондом.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 100+ INFO SECTION (База знаний) -->
+    <section class="section">
+        <div class="container">
+            <span class="label">Индекс Базы Знаний</span>
+            <h2 class="title" style="font-size: 3rem;">Библиотека <br><span class="text-accent">Материалов</span></h2>
+            <p class="subtitle">Мы публикуем не просто посты, а формируем полноценную энциклопедию разработки. Вот малая часть того, что вы найдете по хештегам канала.</p>
+
+            <div class="data-grid">
+                <!-- Колонка 1 -->
+                <div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 24px; border-bottom: 1px solid var(--accent); padding-bottom: 12px; display: inline-block;">Программирование (Luau)</h3>
+                    <ul class="data-list">
+                        <li>
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            <div>
+                                <strong>Клиент-Серверная архитектура</strong>
+                                Разбор RemoteEvents и RemoteFunctions. Как защитить игру от эксплойтов.
+                            </div>
+                        </li>
+                        <li>
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            <div>
+                                <strong>DataStore Service</strong>
+                                Сохранение прогресса игроков, кэширование данных, обработка ошибок и лимитов API.
+                            </div>
+                        </li>
+                        <li>
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            <div>
+                                <strong>Raycasting & Физика</strong>
+                                Создание хитбоксов, оружия, систем зрения для NPC и кастомных передвижений.
+                            </div>
+                        </li>
+                        <li>
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            <div>
+                                <strong>Оптимизация (Memory Leaks)</strong>
+                                Профилирование скриптов, работа с Garbage Collector и устранение лагов.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Колонка 2 -->
+                <div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 24px; border-bottom: 1px solid var(--accent); padding-bottom: 12px; display: inline-block;">Дизайн, Билдинг и Мета</h3>
+                    <ul class="data-list">
+                        <li>
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            <div>
+                                <strong>Построение UI (Графический интерфейс)</strong>
+                                Адаптация под все устройства, анимация кнопок (TweenService), работа с ViewportFrame.
+                            </div>
+                        </li>
+                        <li>
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            <div>
+                                <strong>Моделирование и Окружение</strong>
+                                Импорт из Blender, настройка PBR-текстур, настройка освещения (Future Lighting).
+                            </div>
+                        </li>
+                        <li>
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            <div>
+                                <strong>Монетизация Плейса</strong>
+                                Психология GamePass, интеграция Developer Products, Premium Payouts.
+                            </div>
+                        </li>
+                        <li>
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            <div>
+                                <strong>Алгоритмы Roblox</strong>
+                                Как попасть в рекомендации, работа с иконками, удержание игроков (Retention rate).
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA SECTION -->
+    <section class="section" style="border-bottom: none; padding-bottom: 180px;">
+        <div class="container">
+            <div class="cta-banner">
+                <span class="label" style="color: var(--text-main);">Доступ открыт</span>
+                <h2>Начни свой путь в Roblox<br>вместе с нами</h2>
+                <p class="subtitle" style="margin: 0 auto 40px auto; color: #cbd5e1;">Ежедневные посты, сотни готовых скриптов, новости без воды и активное комьюнити. Подключайся к терминалу.</p>
+                
+                <a href="https://t.me/" class="btn" target="_blank">
+                    <svg viewBox="0 0 24 24"><path d="M21.93 3.14L2.06 10.82c-1.33.51-1.32 1.28-.24 1.61l5.12 1.6 11.88-7.5c.56-.34 1.07-.16.66.21l-9.61 8.68-.35 5.3c.51 0 .73-.24 1.02-.52l2.45-2.38 5.1 3.77c.94.52 1.61.25 1.84-.85l3.33-15.68c.32-1.28-.48-1.87-1.33-1.52z"/></svg>
+                    Открыть Telegram
+                </a>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
