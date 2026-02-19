@@ -6,6 +6,8 @@ Telegram бот с системой тикетов, админ-панелью и
 ![aiogram](https://img.shields.io/badge/aiogram-3.4.1-green)
 ![License](https://img.shields.io/badge/license-MIT-orange)
 
+🔗 **Репозиторий:** https://github.com/dimasik47k-ship-it/nengy
+
 ---
 
 ## 🚀 Быстрый старт
